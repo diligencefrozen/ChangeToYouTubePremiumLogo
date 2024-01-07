@@ -1,31 +1,7 @@
 // ==UserScript==
 // @name         FakeYTPremiumlogo
 
-// @namespace    http://tampermonkey.net/
-
-// @compatible          firefox Violentmonkey
-
-// @compatible          firefox Tampermonkey
-
-// @compatible          firefox FireMonkey
-
-// @compatible          chrome Violentmonkey
-
-// @compatible          chrome Tampermonkey
-
-// @compatible          opera Violentmonkey
-
-// @compatible          opera Tampermonkey
-
-// @compatible          safari Stay
-
-// @compatible          edge Violentmonkey
-
-// @compatible          edge Tampermonkey
-
-// @compatible          brave Violentmonkey
-
-// @compatible          brave Tampermonkey
+// @namespace    UserScript
 
 // @version      20240108.3
 
