@@ -5,7 +5,7 @@ This project provides a user script to change the YouTube logo to the YouTube Pr
 
 ## Function
 <li>Change regular YouTube logo to YouTube Premium logo</li><br/>
-<li>You can decorate your YouTube premium logo in a variety of colors (Red, Silver etc.)</li><br/>
+<li>You can decorate your YouTube premium logo in a variety of colors (Black, Silver etc.)</li><br/>
   
 ## How to install
 <li>Install <a href="https://chrome.google.com/webstore/detail/dhdgffkkebhmkfjojejmpbldmpobfkfo">Tampermonkey</a>.</li>
