@@ -1,3 +1,21 @@
+// ==UserScript==
+// @name         FakeYTPremiumlogo
+
+// @namespace    http://tampermonkey.net/
+
+// @version      20240108.1
+
+// @description  Change YouTube logo to Premium version
+
+// @author       diligencefrozen
+
+// @match        https://www.youtube.com/*
+
+// @grant        none
+
+
+// ==/UserScript==
+
 function changeYouTubeLogo() {
     var ytIcon = document.getElementById('logo-icon');
     ytIcon.innerHTML = '';
