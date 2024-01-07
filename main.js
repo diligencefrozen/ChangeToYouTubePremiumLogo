@@ -3,7 +3,31 @@
 
 // @namespace    http://tampermonkey.net/
 
-// @version      20240108.1
+// @compatible          firefox Violentmonkey
+
+// @compatible          firefox Tampermonkey
+
+// @compatible          firefox FireMonkey
+
+// @compatible          chrome Violentmonkey
+
+// @compatible          chrome Tampermonkey
+
+// @compatible          opera Violentmonkey
+
+// @compatible          opera Tampermonkey
+
+// @compatible          safari Stay
+
+// @compatible          edge Violentmonkey
+
+// @compatible          edge Tampermonkey
+
+// @compatible          brave Violentmonkey
+
+// @compatible          brave Tampermonkey
+
+// @version      20240108.3
 
 // @description  Change YouTube logo to Premium version
 
