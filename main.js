@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FakeYTPremiumlogo
 
-// @namespace    UserScript
+// @namespace    http://tampermonkey.net/
 
 // @version      20240108.3
 
