@@ -28,7 +28,6 @@ This project provides a user script to change the YouTube logo to the YouTube Pr
 After installing the script, when you visit the YouTube website, <br/>the logo automatically changes to the Premium logo that you have set up.
 
 ## Refer to
-<a href="https://github.com/eCxb3/cps">eCzb3/cps</a>의 This project is inspired by **"YouTube Premium.user.js"**.
-
+This project is inspired by <a href="https://github.com/eCxb3/cps">eCzb3/cps's "YouTube Premium.user.js"</a>.
 
 
