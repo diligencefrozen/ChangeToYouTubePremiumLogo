@@ -14,7 +14,7 @@ This project provides a user script to change the YouTube logo to the YouTube Pr
 <a href="https://raw.githubusercontent.com/diligencefrozen/FakeYTPremiumlogo/main/orange.js"><br/><img src="https://github.com/diligencefrozen/FakeYTPremiumlogo/blob/main/logo/orange.png?raw=true"><br/><br/></a>
 <a href="https://raw.githubusercontent.com/diligencefrozen/FakeYTPremiumlogo/main/silver.js"><br/><img src="https://github.com/diligencefrozen/FakeYTPremiumlogo/blob/main/logo/silver.png?raw=true"><br/><br/></a>
 
-<li>Copy all the source.</li><br/>
+<li>Copy the source.</li><br/>
 <li>Click the "Create a new script" in the Tampermonkey.</li><br/>
 <img src="https://github.com/diligencefrozen/FakeYTPremiumlogo/blob/main/logo/readme_manual.png?raw=true"><br/><br/>
 
