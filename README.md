@@ -10,9 +10,9 @@ This project provides a user script to change the YouTube logo to the YouTube Pr
 ## How to install
 <li>Install <a href="https://chrome.google.com/webstore/detail/dhdgffkkebhmkfjojejmpbldmpobfkfo">Tampermonkey</a>.</li>
 <li>Click on the logo</li><br/>
-<a href="https://raw.githubusercontent.com/diligencefrozen/FakeYTPremiumlogo/main/main.js"><img src="https://github.com/diligencefrozen/FakeYTPremiumlogo/blob/main/logo/original.png?raw=true"><br/><br/></a>
-<a href="https://raw.githubusercontent.com/diligencefrozen/FakeYTPremiumlogo/main/black.js"><br/><img src="https://github.com/diligencefrozen/FakeYTPremiumlogo/blob/main/logo/black.png?raw=true"><br/><br/></a>
-<a href="https://raw.githubusercontent.com/diligencefrozen/FakeYTPremiumlogo/main/pink.js"><br/><img src="https://github.com/diligencefrozen/FakeYTPremiumlogo/blob/main/logo/pink.png?raw=true"><br/><br/></a>
+<a href="https://raw.githubusercontent.com/diligencefrozen/FakeYouTubePremiumlogo/main/youtubepremiumlogo/main.js"><img src="https://github.com/diligencefrozen/FakeYTPremiumlogo/blob/main/logo/original.png?raw=true"><br/><br/></a>
+<a href="https://raw.githubusercontent.com/diligencefrozen/FakeYouTubePremiumlogo/main/youtubepremiumlogo/black.js"><br/><img src="https://github.com/diligencefrozen/FakeYTPremiumlogo/blob/main/logo/black.png?raw=true"><br/><br/></a>
+<a href="https://raw.githubusercontent.com/diligencefrozen/FakeYouTubePremiumlogo/main/youtubepremiumlogo/pink.js"><br/><img src="https://github.com/diligencefrozen/FakeYTPremiumlogo/blob/main/logo/pink.png?raw=true"><br/><br/></a>
 
 <li>Copy the Source code.</li><br/>
 <li>Click the "Create a new script" in the Tampermonkey.</li><br/>
