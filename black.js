@@ -3,7 +3,7 @@
 
 // @namespace    http://tampermonkey.net/
 
-// @version      20240108.2
+// @version      20240108.3
 
 // @description  Change YouTube logo to Premium version
 
@@ -24,9 +24,9 @@ function changeYouTubeLogo() {
     newLogo.width = 94;
 
     if (document.documentElement.getAttribute('dark')) {
-        newLogo.src = 'https://github.com/diligencefrozen/FakeYTPremiumlogo/blob/main/logo/logov3.png?raw=true';
+        newLogo.src = 'https://github.com/diligencefrozen/FakeYouTubePremiumlogo/blob/main/logo/logov3.png?raw=true';
     } else {
-        newLogo.src = 'https://github.com/diligencefrozen/FakeYTPremiumlogo/blob/main/logo/logov4.png?raw=true';
+        newLogo.src = 'https://github.com/diligencefrozen/FakeYouTubePremiumlogo/blob/main/logo/logov4.png?raw=true';
     }
 
     ytIcon.appendChild(newLogo);
