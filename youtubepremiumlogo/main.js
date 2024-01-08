@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         FakeYouTubePremiumlogo
+// @name         FakeYouTubePremiumlogo(Original, Red)
 
 // @namespace    http://tampermonkey.net/
 
