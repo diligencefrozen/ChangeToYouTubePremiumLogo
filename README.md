@@ -22,7 +22,7 @@ This project provides a user script to change the YouTube logo to the YouTube Pr
 <img src="https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/readme_manual02.png?raw=true"><br/><br/>
 
 <li>Script installed.</li><br/>
-<img src="https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/readme_manual03.png?raw=true"><br/><br/>
+<img src="https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/readme_manual04.png?raw=true"><br/><br/>
   
 ## How to use
 After installing the script, when you visit the YouTube website, <br/>the logo automatically changes to the Premium logo that you have set up.
