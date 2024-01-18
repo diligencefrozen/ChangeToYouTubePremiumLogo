@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChangeToYouTubePremiumLogo(Index)
 // @namespace    http://tampermonkey.net/
-// @version      20240118.4
+// @version      20240118.5
 // @description  Change YouTube logo to Premium version
 // @author       diligencefrozen
 // @match        https://www.youtube.com/*
@@ -11,7 +11,6 @@
 (function() {
     'use strict';
 
-    // 설정 UI 생성 함수
     function createSettingsUI() {
         const container = document.createElement('div');
         container.id = 'logoChangeContainer';
@@ -32,37 +31,39 @@
         `;
         document.body.appendChild(container);
 
-        // 이벤트 리스너 설정
         document.getElementById('logoChangeSelect').addEventListener('change', function() {
             const value = this.value;
             changeLogo(value);
         });
     }
 
-    // 로고 변경 함수
     function changeLogo(color) {
         const scriptMap = {
-            'Original': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/main.js',
-            'Black': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/black.js',
-            'Pink': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/pink.js',
-            'Yellow': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/yellow.js',
-            'Green': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/green.js',
-            'Brown': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/brown.js',
-            'Grey': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/grey.js',
-            // 다른 색상에 대한 스크립트 URL 추가...
+            'original': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/main.js',
+            'black': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/black.js',
+            'pink': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/pink.js',
+            'yellow': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/yellow.js',
+            'green': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/green.js',
+            'brown': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/brown.js',
+            'grey': 'https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/grey.js',
         };
 
         loadScript(scriptMap[color]);
     }
 
-    // 스크립트 로드 함수
     function loadScript(scriptName) {
+        // 이전에 로드된 스크립트 제거
+        const existingScript = document.getElementById('customLogoScript');
+        if (existingScript) {
+            existingScript.remove();
+        }
+
+        // 새 스크립트 로드
         let script = document.createElement('script');
+        script.id = 'customLogoScript';
         script.src = scriptName;
         document.body.appendChild(script);
     }
 
-    // 설정 UI 초기화
     createSettingsUI();
 })();
-
