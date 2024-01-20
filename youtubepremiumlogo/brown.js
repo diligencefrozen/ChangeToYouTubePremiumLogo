@@ -1,8 +1,6 @@
 // ==UserScript==
 // @name         ChangeToYouTubePremiumLogo(Brown)
 
-// @namespace    http://tampermonkey.net/
-
 // @version      20240120.1
 
 // @description  Change YouTube logo to Premium version
