@@ -16,9 +16,9 @@
 
 // @icon         https://www.google.com/s2/favicons?domain=youtube.com
 
-// @updateURL    https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/main.js
+// @updateURL    https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/black.js
 
-// @downloadURL  https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/main.js
+// @downloadURL  https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/black.js
 
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js
 
