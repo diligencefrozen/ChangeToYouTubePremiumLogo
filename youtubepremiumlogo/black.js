@@ -3,7 +3,7 @@
 
 // @namespace    http://tampermonkey.net/
 
-// @version      20240120.1
+// @version      20240120.2
 
 // @description  Change YouTube logo to Premium version
 
@@ -13,7 +13,7 @@
 
 // @grant        none
 
-// @namespace https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
+// @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
 
 // ==/UserScript==
 
