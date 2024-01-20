@@ -1,15 +1,15 @@
 // ==UserScript==
 
 // @name         ChangeToYouTubePremiumLogo(Black)
-// @version      20240120.7
+// @version      20240120.8
 // @description  Change YouTube logo to Premium version
 // @author       diligencefrozen
 // @match        https://www.youtube.com/*
 // @grant        none
 // @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
 // @icon         https://www.google.com/s2/favicons?domain=youtube.com
-// @updateURL    https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/main.js
-// @downloadURL  https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/main.js
+// @updateURL    https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/black.js
+// @downloadURL  https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/black.js
 
 // ==/UserScript==
 
