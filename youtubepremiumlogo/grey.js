@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChangeToYouTubePremiumLogo(Grey)
 
-// @version      20240120.2
+// @version      20240120.3
 
 // @description  Change YouTube logo to Premium version
 
