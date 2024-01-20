@@ -2,7 +2,7 @@
 
 // @name         ChangeToYouTubePremiumLogo(Pink)
 
-// @version      20240120.5
+// @version      20240120.6
 
 // @description  Change YouTube logo to Premium version
 
@@ -30,9 +30,9 @@ function changeYouTubeLogo() {
     newLogo.width = 94;
 
     if (document.documentElement.getAttribute('dark')) {
-        newLogo.src = 'https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/logov5.png?raw=true';
-    } else {
         newLogo.src = 'https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/logov6.png?raw=true';
+    } else {
+        newLogo.src = 'https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/logov5.png?raw=true';
     }
 
     ytIcon.appendChild(newLogo);
