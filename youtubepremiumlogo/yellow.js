@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChangeToYouTubePremiumLogo(Yellow)
 
-// @version      20240120.2
+// @version      20240120.3
 
 // @description  Change YouTube logo to Premium version
 
@@ -12,6 +12,12 @@
 // @grant        none
 
 // @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
+
+// @icon         https://www.google.com/s2/favicons?domain=youtube.com
+
+// @updateURL    https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/yellow.js
+
+// @downloadURL  https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/yellow.js
 
 // ==/UserScript==
 
