@@ -1,4 +1,4 @@
-# ChangeToYouTubePremiumLogo
+# ChangeToYouTubeLogo
 
 ## Introduction
 This project provides a user script to change the YouTube logo to the YouTube Premium logo. 
