@@ -2,7 +2,7 @@
 
 // @name         ChangeToYouTubePremiumLogo(Grey)
 
-// @version      20240120.12
+// @version      20240121.1
 
 // @description  Change YouTube logo to Premium version
 
@@ -27,22 +27,22 @@
 
 (function() {
     'use strict';
-    // jQuery를 충돌 없이 사용하기 위한 설정
+    // Configuration to use jQuery without any conflicts
     const $ = jQuery.noConflict(true);
 
-    // 로고의 위치를 선택하고 기존 내용을 비움
+    // Select the location of the logo and clear its existing content
     let logoContainer = $('#logo-icon').empty();
 
-    // 적용할 로고 이미지의 URL 설정
+    // Set the URL for the logo image to be applied
     let darkModeLogoURL = 'https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/logov13.png?raw=true';
     let lightModeLogoURL = 'https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/logov14.png?raw=true';
 
-    // 다크 모드 여부에 따라 적절한 로고 적용
+    // Apply the appropriate logo based on whether dark mode is enabled
     let logoURL = $('html').is('[dark]') ? darkModeLogoURL : lightModeLogoURL;
 
-    // 이미지 요소 생성 및 스타일 설정
+    // Create an image element and set its style
     let imgElement = $('<img>', { src: logoURL, style: 'width: 94px' });
 
-    // 로고 컨테이너에 이미지 삽입
+    // Insert the image into the logo container
     logoContainer.append(imgElement);
 })();
