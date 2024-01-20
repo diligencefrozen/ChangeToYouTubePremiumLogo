@@ -33,6 +33,6 @@ After installing the script, when you visit the YouTube website, <br/>the logo a
 
 ## Refer to
 This project is inspired by <a href="https://github.com/eCxb3/cps">eCzb3/cps's "YouTube Premium.user.js"</a>.<br/>
-This project is inspired by <a href="https://gist.github.com/barraIhsan/bc901bc9c3604749d48361d23a094d29">barraIhsan/README.md's "ytPremiumLogo.user.js"</a>.
+
 
 
