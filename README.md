@@ -17,6 +17,7 @@ This project provides a user script to change the YouTube logo to the YouTube Pr
 <a href="https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/green.js"><br/><img src="https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/green.png?raw=true"><br/><br/></a>
 <a href="https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/brown.js"><br/><img src="https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/brown.png?raw=true"><br/><br/></a>
 <a href="https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/grey.js"><br/><img src="https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/grey.png?raw=true"><br/><br/></a>
+<a href="https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/indigo.js"><br/><img src="https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/indigo.png?raw=true"><br/><br/></a>
 
 <li>Copy the Source code.</li><br/>
 <li>Click the "Create a new script" in the Tampermonkey.</li><br/>
