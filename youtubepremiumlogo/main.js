@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Premium Logo (Dark/Light, All Instances)
 // @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
-// @version      20240618.1
+// @version      20250618.2
 // @description  Replaces every YouTube logo (<yt-icon id="logo-icon">) with the Premium logo and keeps it in sync with Dark/Light theme & SPA navigation. No jQuery.
 // @match        https://www.youtube.com/*
 // @grant        none
