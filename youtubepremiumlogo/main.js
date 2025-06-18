@@ -14,24 +14,18 @@
     const darkLogo  = "https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/logo/logov1.png";
     const lightLogo = "https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/logo/logov2.png";
 
-    /** Returns current logo URL according to theme */
     const getLogoURL = () => (document.documentElement.hasAttribute("dark") ? darkLogo : lightLogo);
 
-    /**
-     * Replace the SVG inside a single <yt-icon id="logo-icon"> element.
-     * Idempotent: If already patched, only updates <img>.src
-     */
     function replaceLogo(container) {
         if (!container) return;
 
-        // Already processed → just switch src if theme changed
         if (container.dataset._premiumLogoApplied === "1") {
             const img = container.querySelector("img[data-premium-logo]");
             if (img) img.src = getLogoURL();
             return;
         }
 
-        container.innerHTML = ""; // Remove default SVG
+        container.innerHTML = ""; 
         const img = document.createElement("img");
         img.src = getLogoURL();
         img.alt = "YouTube Premium";
@@ -39,24 +33,23 @@
         img.style.height = "auto";
         img.dataset.premiumLogo = "1";
         container.appendChild(img);
-        container.dataset._premiumLogoApplied = "1"; // mark processed
+        container.dataset._premiumLogoApplied = "1"; 
     }
 
-    /** Apply replacement to every current instance on the page */
+
     const applyToAllLogos = () => {
         document.querySelectorAll("#logo-icon").forEach(replaceLogo);
     };
 
-    /** Observe entire document for any new #logo-icon nodes (SPA navigation creates them) */
     const startLogoObserver = () => {
         const observer = new MutationObserver(mutations => {
             for (const m of mutations) {
-                // Fast path: if new nodes include #logo-icon or subtree might
+ 
                 for (const node of m.addedNodes) {
                     if (node.nodeType !== 1) continue;
                     if (node.id === "logo-icon" || node.querySelector?.("#logo-icon")) {
                         applyToAllLogos();
-                        return; // one run is enough per batch
+                        return; 
                     }
                 }
             }
@@ -64,7 +57,6 @@
         observer.observe(document.documentElement, {childList: true, subtree: true});
     };
 
-    /** Observe theme toggles (<html dark> attr changes) */
     const startThemeObserver = () => {
         const observer = new MutationObserver(() => {
             document.querySelectorAll("#logo-icon img[data-premium-logo]").forEach(img => {
@@ -74,7 +66,6 @@
         observer.observe(document.documentElement, {attributes: true, attributeFilter: ["dark"]});
     };
 
-    // Wait until DOM ready (we run at document-start but need actual nodes)
     const ready = () => {
         applyToAllLogos();
         startLogoObserver();
