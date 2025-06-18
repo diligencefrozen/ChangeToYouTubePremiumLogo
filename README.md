@@ -9,7 +9,7 @@ This project provides a user script to change the YouTube logo to the YouTube Pr
   
 ## How to install
 <li>Install <a href="https://chrome.google.com/webstore/detail/dhdgffkkebhmkfjojejmpbldmpobfkfo">Tampermonkey</a>.</li>
-<li>Click on the logo</li><br/>
+<li>[👉 Install ChangeToYouTubePremiumLogo](https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/ChangeToYouTubePremiumLogo.user.js)</li><br/>
 <a href="https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/youtubepremiumlogo/main.js"><img src="https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/original.png?raw=true"><br/><br/></a>
 
 <li>Copy the Source code.</li><br/>
