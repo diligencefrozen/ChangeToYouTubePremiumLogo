@@ -13,10 +13,6 @@
 (function () {
     "use strict";
 
-    /* ----------------------------------------------------------------------
-     * 1. COLOR ⇢ FILE 매핑 설정
-     * ------------------------------------------------------------------ */
-
     const BASE = "https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/logo/";
 
     /**
