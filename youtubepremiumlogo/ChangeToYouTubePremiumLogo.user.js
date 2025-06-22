@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         ChangeToYouTubePremiumLogo (Multi-Color)
 // @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
-// @version      20250623.3          
-// @description  Replace the YouTube logo with a Premium logo (Safari → always red; logo click → 홈/새로고침).
+// @version      20250623.5
+// @description  Replace the YouTube logo with a Premium logo (Safari → always red; logo click → refresh) and hide “KR/US” country code.
 // @match        https://www.youtube.com/*
 // @match        https://m.youtube.com/*
 // @match        https://youtube.com/*
@@ -18,7 +18,8 @@
   /* ───────────── Safari 감지 ───────────── */
   const isSafari = () => {
     const ua = navigator.userAgent;
-    return /Safari/i.test(ua) && !/Chrome|CriOS|OPiOS|EdgiOS|Edg|FxiOS|Brave|Vivaldi/i.test(ua);
+    return /Safari/i.test(ua) &&
+           !/Chrome|CriOS|OPiOS|EdgiOS|Edg|FxiOS|Brave|Vivaldi/i.test(ua);
   };
 
   const LOGO_SELECTORS = ["#logo-icon", "#logo"]; // 데스크톱 + 모바일
@@ -57,6 +58,39 @@
     return BASE + file;
   };
 
+  /* ───────────── 국가 코드 제거 (CSS + JS) ───────────── */
+  const hideCountryCodeCSS = () => {
+    const ID = "yt-premium-hide-country";
+    if (document.getElementById(ID)) return;
+
+    const style = document.createElement("style");
+    style.id = ID;
+    style.textContent = `
+      /* YouTube가 로고 옆에 붙이는 모든 country code 변형 차단 */
+      ytd-topbar-logo-renderer sup,
+      a#logo sup,
+      #logo-icon sup,
+      .ytd-logo-country-code-renderer,
+      #country-code,
+      yt-formatted-string.country-code,
+      yt-formatted-string.ytd-logo-country-code-renderer {
+        display: none !important;
+      }
+    `;
+    document.head.append(style);
+  };
+
+  const removeCountryCodeOnce = () => {
+    document.querySelectorAll(
+      `ytd-topbar-logo-renderer sup,
+       a#logo sup,
+       #logo-icon sup,
+       .ytd-logo-country-code-renderer,
+       #country-code,
+       yt-formatted-string.country-code`
+    ).forEach(el => el.remove());
+  };
+
   /* ───────────── 로고 교체 ───────────── */
   function patchLogo(el) {
     if (!el) return;
@@ -66,12 +100,8 @@
       el.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (location.pathname === "/") {
-          location.reload();
-        } else {
-          location.href = "/";
-        }
-      }, true);               // capture 단계에서 처리해 Polymer 라우터보다 먼저 실행
+        location.pathname === "/" ? location.reload() : (location.href = "/");
+      }, true); // capture 단계
       el.dataset.ytLogoClickBound = "1";
       el.style.cursor = "pointer";
     }
@@ -89,9 +119,9 @@
     img.alt  = "YouTube Premium";
     img.src  = getLogoURL();
     img.style.cssText = `
-        width: 94px;
-        height: auto;
-        pointer-events: none;   /* 클릭을 래퍼 <a>/<button>으로 통과 */
+      width: 94px;
+      height: auto;
+      pointer-events: none;  
     `;
     el.appendChild(img);
     el.dataset.ytpremium = "1";
@@ -100,8 +130,9 @@
   const patchAll = () =>
     document.querySelectorAll(LOGO_SELECTORS.join(",")).forEach(patchLogo);
 
-  /* ───────────── DOM 변화 감시 ───────────── */
+  /* ───────────── DOM 관찰 ───────────── */
   function observeDOM() {
+    // 로고가 새로 생길 때마다 교체 + 국가코드 제거
     new MutationObserver((muts) => {
       for (const m of muts) {
         for (const n of m.addedNodes) {
@@ -111,25 +142,30 @@
             n.querySelector?.(LOGO_SELECTORS.join(","))
           ) {
             patchAll();
+            removeCountryCodeOnce();
             return;
           }
         }
       }
     }).observe(document.documentElement, { childList: true, subtree: true });
 
+    // 다크모드 전환 시 로고 스킨 교체
     new MutationObserver(() => {
-      document
-        .querySelectorAll("img[data-premium-logo]")
-        .forEach((img) => (img.src = getLogoURL()));
+      document.querySelectorAll("img[data-premium-logo]")
+              .forEach(img => (img.src = getLogoURL()));
     }).observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["dark"],
     });
+
+    // 국가 코드가 뒤늦게 삽입되더라도 즉시 삭제
+    new MutationObserver(removeCountryCodeOnce)
+      .observe(document.documentElement, { childList: true, subtree: true });
   }
 
   /* ───────────── 메뉴 (Safari 제외) ───────────── */
   function registerMenu() {
-    if (isSafari()) return; // Safari는 red 고정 → 메뉴 숨김
+    if (isSafari()) return;
 
     const label = () => `Set Logo Color (current: ${currentColor()})`;
     GM_registerMenuCommand(label(), () => {
@@ -149,8 +185,9 @@
 
   /* ───────────── 초기화 ───────────── */
   const init = () => {
-    patchAll();
-    observeDOM();
+    hideCountryCodeCSS();   // CSS로 1차 차단
+    patchAll();             // 로고 교체
+    observeDOM();           // 변동 감시
     registerMenu();
   };
 
