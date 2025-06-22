@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         ChangeToYouTubePremiumLogo (Multi-Color)
 // @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
-// @version      20250623.6
+// @version      20250623.7
 // @description  Replace the YouTube logo with a Premium logo (Safari → always red; logo click → refresh) and hide “KR/US” country code.
-// @icon         https://www.youtube.com/s/desktop/7e8e746c/img/favicon_144x144.png 
+// @icon https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/original.png?raw=true
 // @match        https://www.youtube.com/*
 // @match        https://m.youtube.com/*
 // @match        https://youtube.com/*
