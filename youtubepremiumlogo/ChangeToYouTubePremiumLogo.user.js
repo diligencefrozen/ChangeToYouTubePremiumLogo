@@ -1,14 +1,22 @@
 // ==UserScript==
 // @name         ChangeToYouTubePremiumLogo (Multi‑Color)
 // @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
-// @version      20250618.3
+// @version      20250623.0
 // @description  Replace the YouTube logo with a Premium logo in the color of your choice (Red, Black, Brown, Green, Grey, Indigo, Pink, Yellow …).
 // @match        https://www.youtube.com/*
+// @match        https://m.youtube.com/*
+// @match        https://youtube.com/*
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_registerMenuCommand
 // @run-at       document-start
 // ==/UserScript==
+
+ const LOGO_SELECTORS = ['#logo-icon', '#logo'];   // 데스크톱 + 모바일
+
+ const GMget = (k,d)=>
+     typeof GM_getValue==='function' ? GM_getValue(k,d)
+     : GM.getValue ? GM.getValue(k,d) : Promise.resolve(d);
 
 (function () {
     "use strict";
