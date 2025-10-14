@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         ChangeToYouTubePremiumLogo (Multi-Color)
+// @name         ChangeToYouTubePremiumLogo 
 // @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
-// @version      20250623.8
-// @description  Replace the YouTube logo with a Premium logo (Safari → always red; logo click → refresh) and hide “KR/US” country code.
+// @version      20251014.2
+// @description  Replace only the inline SVG logo. Safari → red; logo click → refresh/home.
 // @icon         https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/original.png?raw=true
 // @match        https://www.youtube.com/*
 // @match        https://m.youtube.com/*
@@ -16,26 +16,17 @@
 (() => {
   "use strict";
 
-  /* ───────────── Safari 감지 ───────────── */
+  /* ──────────── UA / Theme ──────────── */
   const isSafari = () => {
     const ua = navigator.userAgent;
     return /Safari/i.test(ua) &&
            !/Chrome|CriOS|OPiOS|EdgiOS|Edg|FxiOS|Brave|Vivaldi/i.test(ua);
   };
+  const isDark = () => document.documentElement.hasAttribute("dark");
 
-  const LOGO_SELECTORS = ["#logo-icon", "#logo"]; // 데스크톱 + 모바일
-
-  // GM 저장소 래퍼
-  const GMget = (k, d) =>
-    typeof GM_getValue === "function"
-      ? GM_getValue(k, d)
-      : typeof GM !== "undefined" && GM.getValue
-      ? GM.getValue(k, d)
-      : d;
-
-  const BASE =
-    "https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/logo/";
-
+  /* ──────────── Assets ──────────── */
+  const BASE = "https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/logo/";
+  const DEFAULT_COLOR = "red";
   const COLOR_MAP = {
     red:    { dark: "logov1.png",  light: "logov2.png"  },
     black:  { dark: "logov3.png",  light: "logov4.png"  },
@@ -47,152 +38,164 @@
     indigo: { dark: "logov15.png", light: "logov16.png" },
   };
 
-  const DEFAULT_COLOR = "red";
-  const isDark = () => document.documentElement.hasAttribute("dark");
+  /* ──────────── Storage (sync/async safe) ──────────── */
+  const hasLegacySync = typeof GM_getValue === "function";
+  const hasModernAsync = typeof GM !== "undefined" && typeof GM.getValue === "function";
+  const store = {
+    async get(key, defVal) {
+      if (isSafari()) return defVal;
+      try {
+        if (hasLegacySync) return GM_getValue(key, defVal);
+        if (hasModernAsync) return await GM.getValue(key, defVal);
+      } catch {}
+      return defVal;
+    },
+    async set(key, val) {
+      if (isSafari()) return;
+      try {
+        if (typeof GM_setValue === "function") return GM_setValue(key, val);
+        if (typeof GM !== "undefined" && typeof GM.setValue === "function") return GM.setValue(key, val);
+      } catch {}
+    }
+  };
 
-  const currentColor = () =>
-    isSafari() ? DEFAULT_COLOR : GMget("logoColor", DEFAULT_COLOR);
+  const state = { color: DEFAULT_COLOR };
 
   const getLogoURL = () => {
-    const cfg  = COLOR_MAP[currentColor()] || COLOR_MAP[DEFAULT_COLOR];
+    const cfg  = COLOR_MAP[state.color] || COLOR_MAP[DEFAULT_COLOR];
     const file = (isDark() ? cfg.dark : cfg.light) || cfg.dark;
     return BASE + file;
   };
 
-  /* ───────────── 국가 코드 제거 (CSS + JS) ───────────── */
-  const hideCountryCodeCSS = () => {
-    const ID = "yt-premium-hide-country";
-    if (document.getElementById(ID)) return;
+  /* ──────────── Core: replace only the SVG, keep country code ──────────── */
+  function replaceSvgWithImg(svg) {
+    if (!svg || svg.dataset.premiumReplaced === "1") return;
 
-    const style = document.createElement("style");
-    style.id = ID;
-    style.textContent = `
-      /* YouTube가 로고 옆에 붙이는 모든 country code 변형 차단 */
-      ytd-topbar-logo-renderer sup,
-      a#logo sup,
-      #logo-icon sup,
-      .ytd-logo-country-code-renderer,
-      #country-code,
-      yt-formatted-string.country-code,
-      yt-formatted-string.ytd-logo-country-code-renderer {
-        display: none !important;
+    // Create img
+    const img = document.createElement("img");
+    img.dataset.premiumLogo = "1";
+    img.alt = "YouTube Premium";
+    img.src = getLogoURL();
+    img.style.cssText = "width:94px;height:auto;pointer-events:none;display:block;";
+
+    // Keep parent structure (anchor + sup country code). Replace only the SVG node.
+    svg.replaceWith(img);
+    // Mark parent for theme updates
+    img.closest("a#logo, #logo, ytd-topbar-logo-renderer, ytm-pivot-bar-renderer")?.setAttribute("data-premium-hasimg", "1");
+  }
+
+  function patchOnceInContainer(container) {
+    if (!container) return;
+    // Target newest inline SVG id prefix (e.g., yt-ringo2-svg_yt10). Cover both desktop & mweb.
+    const svgs = container.querySelectorAll('svg[id^="yt-ringo2-svg_"], svg#logo-icon, a#logo svg, #logo svg');
+    let touched = false;
+    svgs.forEach(svg => {
+      // If already replaced with our img, just refresh src for theme/color changes
+      const nextIsImg = svg.tagName.toLowerCase() === "img" || svg.nextElementSibling?.dataset?.premiumLogo === "1";
+      if (svg.dataset?.premiumReplaced === "1") return;
+
+      // Only swap real SVG nodes; if container already has our <img>, update below
+      if (svg instanceof SVGElement) {
+        replaceSvgWithImg(svg);
+        touched = true;
       }
-    `;
-    document.head.append(style);
-  };
+    });
 
-  const removeCountryCodeOnce = () => {
-    document.querySelectorAll(
-      `ytd-topbar-logo-renderer sup,
-       a#logo sup,
-       #logo-icon sup,
-       .ytd-logo-country-code-renderer,
-       #country-code,
-       yt-formatted-string.country-code`
-    ).forEach(el => el.remove());
-  };
+    // Also refresh existing imgs (e.g., after theme toggle)
+    container.querySelectorAll('img[data-premium-logo="1"]').forEach(img => {
+      img.src = getLogoURL();
+      touched = true;
+    });
 
-  /* ───────────── 로고 교체 ───────────── */
-  function patchLogo(el) {
-    if (!el) return;
+    return touched;
+  }
 
-    // 클릭 핸들러가 이미 붙어있으면 중복 처리 방지
-    if (!el.dataset.ytLogoClickBound) {
-      el.addEventListener("click", (e) => {
+  function patchAll() {
+    // Anchor container usually: a#logo inside ytd-topbar-logo-renderer
+    const containers = [
+      ...document.querySelectorAll('a#logo, #logo, ytd-topbar-logo-renderer, ytm-pivot-bar-renderer')
+    ];
+    if (containers.length === 0) return;
+    containers.forEach(patchOnceInContainer);
+
+    // Ensure clicking the logo behaves as requested (reload/home). We bind on the anchor.
+    const anchors = document.querySelectorAll('a#logo, #logo');
+    anchors.forEach(a => {
+      if (a.dataset.ytLogoClickBound) return;
+      a.addEventListener("click", e => {
+        // Allow modifier keys to open new tab etc.
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
         e.preventDefault();
         e.stopPropagation();
         location.pathname === "/" ? location.reload() : (location.href = "/");
-      }, true); // capture 단계
-      el.dataset.ytLogoClickBound = "1";
-      el.style.cursor = "pointer";
-    }
-
-    // 로고 이미지를 새로 넣거나 갱신
-    if (el.dataset.ytpremium === "1") {
-      const img = el.querySelector("img[data-premium-logo]");
-      if (img) img.src = getLogoURL();
-      return;
-    }
-
-    el.innerHTML = "";
-    const img = document.createElement("img");
-    img.dataset.premiumLogo = "1";
-    img.alt  = "YouTube Premium";
-    img.src  = getLogoURL();
-    img.style.cssText = `
-      width: 94px;
-      height: auto;
-      pointer-events: none;  
-    `;
-    el.appendChild(img);
-    el.dataset.ytpremium = "1";
+      }, true);
+      a.dataset.ytLogoClickBound = "1";
+      a.style.cursor = "pointer";
+    });
   }
 
-  const patchAll = () =>
-    document.querySelectorAll(LOGO_SELECTORS.join(",")).forEach(patchLogo);
+  /* ──────────── Observers ──────────── */
+  const debounce = (fn, wait = 50) => {
+    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
+  };
+  const onDomAdded = debounce(patchAll, 50);
 
-  /* ───────────── DOM 관찰 ───────────── */
-  function observeDOM() {
-    // 로고가 새로 생길 때마다 교체 + 국가코드 제거
+  function observe() {
+    // New nodes (logo re-render, navigation, mweb topbar rebuild)
     new MutationObserver((muts) => {
       for (const m of muts) {
         for (const n of m.addedNodes) {
           if (n.nodeType !== 1) continue;
           if (
-            LOGO_SELECTORS.some((sel) => n.matches?.(sel)) ||
-            n.querySelector?.(LOGO_SELECTORS.join(","))
+            n.matches?.('a#logo, #logo, ytd-topbar-logo-renderer, ytm-pivot-bar-renderer, svg[id^="yt-ringo2-svg_"]') ||
+            n.querySelector?.('a#logo, #logo, ytd-topbar-logo-renderer, ytm-pivot-bar-renderer, svg[id^="yt-ringo2-svg_"]')
           ) {
-            patchAll();
-            removeCountryCodeOnce();
-            return;
+            onDomAdded();
+            break;
           }
         }
       }
     }).observe(document.documentElement, { childList: true, subtree: true });
 
-    // 다크모드 전환 시 로고 스킨 교체
+    // Theme toggle (html[dark])
     new MutationObserver(() => {
-      document.querySelectorAll("img[data-premium-logo]")
-              .forEach(img => (img.src = getLogoURL()));
-    }).observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["dark"],
-    });
-
-    // 국가 코드가 뒤늦게 삽입되더라도 즉시 삭제
-    new MutationObserver(removeCountryCodeOnce)
-      .observe(document.documentElement, { childList: true, subtree: true });
+      document.querySelectorAll('img[data-premium-logo="1"]').forEach(img => (img.src = getLogoURL()));
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ["dark"] });
   }
 
-  /* ───────────── 메뉴 (Safari 제외) ───────────── */
+  /* ──────────── Menu (no country-code hiding anywhere) ──────────── */
   function registerMenu() {
-    if (isSafari()) return;
-
-    const label = () => `Set Logo Color (current: ${currentColor()})`;
-    GM_registerMenuCommand(label(), () => {
+    if (isSafari() || typeof GM_registerMenuCommand !== "function") return;
+    const label = () => `Set Logo Color (current: ${state.color})`;
+    GM_registerMenuCommand(label(), async () => {
       const options = Object.keys(COLOR_MAP).join(", ");
-      const input = prompt(
-        `Enter logo color name.\nAvailable: ${options}`,
-        currentColor()
-      );
+      const input = prompt(`Enter logo color name.\nAvailable: ${options}`, state.color);
       if (!input) return;
-      if (!COLOR_MAP[input]) return alert(`Unknown color: ${input}`);
-
-      GM_setValue("logoColor", input);
+      if (!COLOR_MAP[input]) {
+        alert(`Unknown color: ${input}`);
+        return;
+      }
+      await store.set("logoColor", input);
+      state.color = input;
       patchAll();
       alert(`Logo color switched to: ${input}`);
+      // Re-register for updated label (engines usually rebuild menu on each run)
+      registerMenu();
     });
   }
 
-  /* ───────────── 초기화 ───────────── */
-  const init = () => {
-    hideCountryCodeCSS();   // CSS로 1차 차단
-    patchAll();             // 로고 교체
-    observeDOM();           // 변동 감시
+  /* ──────────── Boot ──────────── */
+  async function init() {
+    // NOTE: No CSS/JS that hides country code. We keep YouTube's <sup> intact.
+    state.color = isSafari() ? DEFAULT_COLOR : await store.get("logoColor", DEFAULT_COLOR);
+    patchAll();
+    observe();
     registerMenu();
-  };
+  }
 
-  document.readyState === "loading"
-    ? document.addEventListener("DOMContentLoaded", init, { once: true })
-    : init();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
 })();
