@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChangeToYouTubePremiumLogo
 // @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
-// @version      20251205.6
+// @version      20251205.9
 // @description  Replace only the inline SVG logo. Safari → red; logo click → refresh/home.
 // @icon         https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/original.png?raw=true
 // @match        https://www.youtube.com/*
@@ -23,6 +23,26 @@
            !/Chrome|CriOS|OPiOS|EdgiOS|Edg|FxiOS|Brave|Vivaldi/i.test(ua);
   };
   const isDark = () => document.documentElement.hasAttribute("dark");
+
+  // Check if on watch page (where theater mode exists)
+  const isWatchPage = () => {
+    return location.pathname.startsWith('/watch');
+  };
+
+  // Check if on Shorts page
+  const isShortsPage = () => {
+    return location.pathname.startsWith('/shorts/');
+  };
+
+  // Check if theater mode is active (background becomes black in light mode)
+  // Only applies to /watch pages (not home, not shorts, not other pages)
+  const isTheaterMode = () => {
+    if (!isWatchPage()) return false; // Theater mode only exists on /watch pages
+    if (isShortsPage()) return false; // Shorts has its own background handling
+    const player = document.querySelector('#movie_player, .html5-video-player');
+    return player?.classList.contains('ytp-big-mode') ||
+           document.querySelector('ytd-watch-flexy[theater]') !== null;
+  };
 
   /* ──────────── Assets ──────────── */
   const BASE = "https://raw.githubusercontent.com/diligencefrozen/ChangeToYouTubePremiumLogo/main/logo/";
@@ -66,7 +86,9 @@
 
   const getLogoURL = () => {
     const cfg  = COLOR_MAP[state.color] || COLOR_MAP[DEFAULT_COLOR];
-    const file = (isDark() ? cfg.dark : cfg.light) || cfg.dark;
+    // Use dark logo if: 1) dark mode is on, OR 2) theater mode is active (even in light mode)
+    const useDark = isDark() || isTheaterMode();
+    const file = (useDark ? cfg.dark : cfg.light) || cfg.dark;
     return BASE + file;
   };
 
@@ -195,6 +217,32 @@
     new MutationObserver(() => {
       document.querySelectorAll('img[data-premium-logo="1"]').forEach(img => (img.src = getLogoURL()));
     }).observe(document.documentElement, { attributes: true, attributeFilter: ["dark"] });
+
+    // Theater mode toggle (watch for ytd-watch-flexy[theater] attribute or player class changes)
+    new MutationObserver(() => {
+      document.querySelectorAll('img[data-premium-logo="1"]').forEach(img => (img.src = getLogoURL()));
+    }).observe(document.body, {
+      attributes: true,
+      attributeFilter: ["theater"],
+      subtree: true
+    });
+
+    // Also observe player class changes for theater mode
+    const observePlayer = () => {
+      const player = document.querySelector('#movie_player, .html5-video-player');
+      if (player) {
+        new MutationObserver(() => {
+          document.querySelectorAll('img[data-premium-logo="1"]').forEach(img => (img.src = getLogoURL()));
+        }).observe(player, {
+          attributes: true,
+          attributeFilter: ["class"]
+        });
+      } else {
+        // Retry if player not found yet
+        setTimeout(observePlayer, 1000);
+      }
+    };
+    observePlayer();
   }
 
   /* ──────────── Menu (no country-code hiding anywhere) ──────────── */
