@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         ChangeToYouTubePremiumLogo 
+// @name         ChangeToYouTubePremiumLogo
 // @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
-// @version      20251014.2
+// @version      20251205.6
 // @description  Replace only the inline SVG logo. Safari → red; logo click → refresh/home.
 // @icon         https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/original.png?raw=true
 // @match        https://www.youtube.com/*
@@ -59,7 +59,10 @@
     }
   };
 
-  const state = { color: DEFAULT_COLOR };
+  const state = {
+    color: DEFAULT_COLOR,
+    yoodleShown: new Set() // Track which yoodle logos have been shown
+  };
 
   const getLogoURL = () => {
     const cfg  = COLOR_MAP[state.color] || COLOR_MAP[DEFAULT_COLOR];
@@ -101,6 +104,37 @@
       }
     });
 
+    // Handle YouTube Yoodle (special event logos like ytd-yoodle-renderer)
+    const yoodleImgs = container.querySelectorAll('ytd-yoodle-renderer img, .ytd-yoodle-renderer img');
+    yoodleImgs.forEach(yoodleImg => {
+      if (yoodleImg.dataset.premiumReplaced === "1") return;
+
+      // Generate unique identifier for this yoodle logo
+      const yoodleId = yoodleImg.src || yoodleImg.alt || 'yoodle-' + Date.now();
+
+      // If we haven't shown this yoodle yet, wait 15 seconds before replacing
+      if (!state.yoodleShown.has(yoodleId)) {
+        state.yoodleShown.add(yoodleId);
+        yoodleImg.dataset.premiumReplaced = "1"; // Mark to prevent re-processing
+
+        // Delay of 15 seconds (15000ms)
+        const delay = 15000;
+        setTimeout(() => {
+          // Create replacement img
+          const img = document.createElement("img");
+          img.dataset.premiumLogo = "1";
+          img.alt = "YouTube Premium";
+          img.src = getLogoURL();
+          img.style.cssText = "width:94px;height:auto;pointer-events:none;display:block;";
+
+          yoodleImg.replaceWith(img);
+          img.closest("a#logo, #logo, ytd-topbar-logo-renderer, ytm-pivot-bar-renderer")?.setAttribute("data-premium-hasimg", "1");
+        }, delay);
+
+        touched = true;
+      }
+    });
+
     // Also refresh existing imgs (e.g., after theme toggle)
     container.querySelectorAll('img[data-premium-logo="1"]').forEach(img => {
       img.src = getLogoURL();
@@ -113,7 +147,7 @@
   function patchAll() {
     // Anchor container usually: a#logo inside ytd-topbar-logo-renderer
     const containers = [
-      ...document.querySelectorAll('a#logo, #logo, ytd-topbar-logo-renderer, ytm-pivot-bar-renderer')
+      ...document.querySelectorAll('a#logo, #logo, ytd-topbar-logo-renderer, ytm-pivot-bar-renderer, ytd-yoodle-renderer')
     ];
     if (containers.length === 0) return;
     containers.forEach(patchOnceInContainer);
@@ -147,8 +181,8 @@
         for (const n of m.addedNodes) {
           if (n.nodeType !== 1) continue;
           if (
-            n.matches?.('a#logo, #logo, ytd-topbar-logo-renderer, ytm-pivot-bar-renderer, svg[id^="yt-ringo2-svg_"]') ||
-            n.querySelector?.('a#logo, #logo, ytd-topbar-logo-renderer, ytm-pivot-bar-renderer, svg[id^="yt-ringo2-svg_"]')
+            n.matches?.('a#logo, #logo, ytd-topbar-logo-renderer, ytm-pivot-bar-renderer, ytd-yoodle-renderer, svg[id^="yt-ringo2-svg_"]') ||
+            n.querySelector?.('a#logo, #logo, ytd-topbar-logo-renderer, ytm-pivot-bar-renderer, ytd-yoodle-renderer, svg[id^="yt-ringo2-svg_"]')
           ) {
             onDomAdded();
             break;
