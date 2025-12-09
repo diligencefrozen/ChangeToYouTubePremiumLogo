@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChangeToYouTubePremiumLogo
 // @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
-// @version      20251208.13
+// @version      20251208.14
 // @description Replace YouTube’s logo with a Premium-style version. Includes color customization, dark/theater mode support, hover animation, Yoodle handling, and logo-click navigation.
 // @icon         https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/original.png?raw=true
 // @match        https://www.youtube.com/*
