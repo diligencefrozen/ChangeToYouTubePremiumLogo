@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChangeToYouTubePremiumLogo
 // @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
-// @version      20251209.6
+// @version      20251208.12
 // @description  Replace only the inline SVG logo. Safari → red; logo click → refresh/home.
 // @icon         https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/original.png?raw=true
 // @match        https://www.youtube.com/*
@@ -69,7 +69,13 @@
       ytd-topbar-logo-renderer:hover img[data-premium-logo="1"] {
         animation: rotate360Premium 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         transform-origin: center;
-        filter: drop-shadow(0 0 20px var(--logo-shadow-color, rgba(255, 0, 0, 0.6)));
+        filter: drop-shadow(0 0 20px var(--logo-shadow-color, rgba(255, 0, 0, 0.6))) 
+                var(--logo-custom-filter, brightness(1) saturate(1)) !important;
+      }
+      
+      /* Apply custom color filter if set */
+      img[data-premium-logo="1"][data-custom-color="true"] {
+        filter: var(--logo-custom-filter, brightness(1) saturate(1)) !important;
       }
       
       /* Smooth transition for logo container */
@@ -264,6 +270,15 @@
 
     // Update shadow color based on current logo color
     updateLogoShadowColor();
+    
+    // Apply custom color filter if needed
+    if (state.customColor && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(state.customColor)) {
+      const imgs = document.querySelectorAll('img[data-premium-logo="1"]');
+      imgs.forEach(img => {
+        img.dataset.customColor = "true";
+        applyCustomColorFilter(img, state.customColor);
+      });
+    }
 
     // Ensure clicking the logo behaves as requested (reload/home). We bind on the anchor.
     const anchors = document.querySelectorAll('a#logo, #logo');
@@ -279,6 +294,58 @@
       a.dataset.ytLogoClickBound = "1";
       a.style.cursor = "pointer";
     });
+  }
+
+  /* ──────────── Apply Custom Color Filter to Logo ──────────── */
+  function applyCustomColorFilter(img, hexColor) {
+    // Calculate the filter to convert red logo to custom color
+    // This uses CSS filters to adjust hue, saturation, and brightness
+    const rgb = hexToRgb(hexColor);
+    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    
+    // Apply hue rotation based on the target color's hue
+    // Red is at 0°, so we calculate the rotation needed
+    const hueRotation = hsl.h; // The hue angle to rotate to
+    const saturation = Math.max(50, hsl.s); // Ensure good saturation
+    const brightness = Math.max(0.8, Math.min(1.2, 1 + (hsl.l - 50) / 100)); // Brightness adjustment
+    
+    const filter = `hue-rotate(${hueRotation}deg) saturate(${saturation / 100}) brightness(${brightness})`;
+    document.documentElement.style.setProperty('--logo-custom-filter', filter);
+  }
+
+  /* ──────────── Color Conversion Utilities ──────────── */
+  function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : { r: 255, g: 0, b: 0 };
+  }
+
+  function rgbToHsl(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0, s = 0;
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        case b: h = ((r - g) / d + 4) / 6; break;
+      }
+    }
+    return {
+      h: Math.round(h * 360),
+      s: Math.round(s * 100),
+      l: Math.round(l * 100)
+    };
   }
 
   /* ──────────── Observers ──────────── */
@@ -339,23 +406,133 @@
   /* ──────────── Menu (no country-code hiding anywhere) ──────────── */
   function registerMenu() {
     if (isSafari() || typeof GM_registerMenuCommand !== "function") return;
+    
     const label = () => `Set Logo Color (current: ${state.color})`;
+    
     GM_registerMenuCommand(label(), async () => {
-      const options = Object.keys(COLOR_MAP).join(", ");
-      const input = prompt(`Enter logo color name.\nAvailable: ${options}`, state.color);
-      if (!input) return;
-      if (!COLOR_MAP[input]) {
-        alert(`Unknown color: ${input}`);
-        return;
-      }
-      await store.set("logoColor", input);
-      state.color = input;
+      showColorSelectionMenu();
+    });
+    
+    // Add help/guide menu
+    GM_registerMenuCommand("📖 Logo Color Guide", () => {
+      showHelpGuide();
+    });
+  }
+
+  /* ──────────── Color Selection Menu with Guide ──────────── */
+  async function showColorSelectionMenu() {
+    const options = Object.keys(COLOR_MAP);
+    const predefinedColors = options.join(", ");
+    
+    const message = `🎨 Select YouTube Logo Color\n\n` +
+      `Enter HEX code for custom color:\n` +
+      `Example: #FF7B33 (orange)\n\n` +
+      `Or use predefined color name:\n${predefinedColors}\n\n` +
+      `Current: ${state.color}`;
+    
+    const input = prompt(message, state.color);
+    if (!input) return;
+    
+    const trimmedInput = input.trim();
+    
+    // Check if it's a predefined color
+    if (COLOR_MAP[trimmedInput]) {
+      await store.set("logoColor", trimmedInput);
+      state.color = trimmedInput;
       updateLogoShadowColor();
       patchAll();
-      alert(`Logo color switched to: ${input}`);
-      // Re-register for updated label (engines usually rebuild menu on each run)
-      registerMenu();
-    });
+      alert(`✅ Logo color changed to: ${trimmedInput}`);
+      return;
+    }
+    
+    // Auto-fix HEX color format (add # if missing)
+    let hexColor = trimmedInput;
+    if (!/^#/.test(hexColor) && /^[A-Fa-f0-9]{6}$|^[A-Fa-f0-9]{3}$/.test(hexColor)) {
+      hexColor = "#" + hexColor;
+      alert(`💡 Tip: Automatically added '#'\nYour input: ${trimmedInput}\nConverted to: ${hexColor}`);
+    }
+    
+    // Validate HEX color (3 or 6 digit hex codes)
+    if (!/^#[A-Fa-f0-9]{3}$|^#[A-Fa-f0-9]{6}$/.test(hexColor)) {
+      alert(`❌ Invalid format\n\nValid HEX code examples:\n#FF7B33\n#FFF\n#FEFEFE`);
+      return;
+    }
+    
+    // Apply custom color
+    await store.set("logoColor", hexColor);
+    state.color = hexColor;
+    state.customColor = hexColor;
+    
+    createCustomColorLogo(hexColor);
+    updateLogoShadowColorCustom(hexColor);
+    patchAll();
+    alert(`✅ Custom logo color applied!\nColor code: ${hexColor}`);
+  }
+
+  /* ──────────── Help Guide ──────────── */
+  function showHelpGuide() {
+    const guide = `📖 YouTube Premium Logo Color Customization Guide\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `✨ Features\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `• Change YouTube logo to any color\n` +
+      `• 360° rotation animation on hover\n` +
+      `• Dynamic shadow matching logo color\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `🎨 Predefined Colors\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `red, black, pink, yellow,\n` +
+      `green, brown, grey, indigo\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `🌈 Custom Colors (HEX Code)\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `What is HEX Code?\n` +
+      `A color representation using hexadecimal.\n\n` +
+      `Format: #RRGGBB\n` +
+      `R = Red (00-FF)\n` +
+      `G = Green (00-FF)\n` +
+      `B = Blue (00-FF)\n\n` +
+      `📝 Examples\n` +
+      `#FF0000 = Red\n` +
+      `#00FF00 = Green\n` +
+      `#0000FF = Blue\n` +
+      `#FFD700 = Gold\n` +
+      `#FF1493 = Deep Pink\n` +
+      `#FEFEFE = Off-white\n\n` +
+      `💡 Tips\n` +
+      `• Omitting '#' is okay - it will auto-add\n` +
+      `• Example: FF7B33 → #FF7B33\n\n` +
+      `🔍 Finding HEX Codes\n` +
+      `Search 'color picker' on Google\n` +
+      `to easily find any color's HEX code.`;
+    
+    alert(guide);
+  }
+
+  /* ──────────── Custom Color Logo Creation ──────────── */
+  function createCustomColorLogo(hexColor) {
+    // Store custom color in state for reference
+    state.customColor = hexColor;
+  }
+
+  function getCustomLogoURL(hexColor) {
+    // For custom colors, we'll use a data URI or cached approach
+    // For now, we'll use the red logo and apply CSS filter to tint it
+    const baseColor = "red";
+    const cfg = COLOR_MAP[baseColor];
+    const useDark = isDark() || isTheaterMode();
+    const file = (useDark ? cfg.dark : cfg.light) || cfg.dark;
+    return BASE + file;
+  }
+
+  /* ──────────── Dynamic Shadow Color Update (Enhanced) ──────────── */
+  function updateLogoShadowColorCustom(hexColor) {
+    // Convert HEX to RGBA for shadow effect
+    const r = parseInt(hexColor.slice(1, 3), 16);
+    const g = parseInt(hexColor.slice(3, 5), 16);
+    const b = parseInt(hexColor.slice(5, 7), 16);
+    const shadowColor = `rgba(${r}, ${g}, ${b}, 0.6)`;
+    document.documentElement.style.setProperty('--logo-shadow-color', shadowColor);
   }
 
   /* ──────────── Boot ──────────── */
@@ -363,6 +540,13 @@
     // NOTE: No CSS/JS that hides country code. We keep YouTube's <sup> intact.
     injectDisableHoverAnimationCSS();
     state.color = isSafari() ? DEFAULT_COLOR : await store.get("logoColor", DEFAULT_COLOR);
+    
+    // Check if saved color is a custom HEX color
+    if (state.color && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(state.color)) {
+      state.customColor = state.color;
+      updateLogoShadowColorCustom(state.color);
+    }
+    
     patchAll();
     observe();
     registerMenu();
