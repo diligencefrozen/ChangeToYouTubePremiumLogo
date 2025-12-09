@@ -2,7 +2,7 @@
 // @name         ChangeToYouTubePremiumLogo
 // @namespace    https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo
 // @version      20251208.12
-// @description  Replace only the inline SVG logo. Safari → red; logo click → refresh/home.
+// @description Replace YouTube’s logo with a Premium-style version. Includes color customization, dark/theater mode support, hover animation, Yoodle handling, and logo-click navigation.
 // @icon         https://github.com/diligencefrozen/ChangeToYouTubePremiumLogo/blob/main/logo/original.png?raw=true
 // @match        https://www.youtube.com/*
 // @match        https://m.youtube.com/*
@@ -11,6 +11,8 @@
 // @grant        GM_setValue
 // @grant        GM_registerMenuCommand
 // @run-at       document-start
+// @license MIT
+
 // ==/UserScript==
 
 (() => {
